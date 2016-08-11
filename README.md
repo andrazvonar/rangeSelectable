@@ -1,6 +1,9 @@
 # rangeSelectable jQuery plugin
 **rangeSelectable** is a plugin that modifies jQuery Selectable to select time ranges.
 
+![rangeSelectable demo](http://i.imgur.com/u4xrIYY.gif)
+
+
 ## Usage
 
 ``` html
