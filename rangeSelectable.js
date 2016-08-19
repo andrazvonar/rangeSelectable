@@ -1,5 +1,5 @@
 /*!
- * jQuery UI Range Selectable 1.0
+ * jQuery UI rangeSelectable 1.0
  *
  * Depends on:
  * 		jQuery UI Selectable 1.12.0
@@ -9,7 +9,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  */
 
- var rangeSelectable = $.widget( "az.rangeSelectable", $.ui.mouse, {
+ var rangeSelectable = $.widget( "az.rangeSelectable", $.ui.selectable, {
  	version: "1.0",
  	options: {
  		appendTo: "body",
@@ -24,130 +24,6 @@
  		stop: null,
  		unselected: null,
  		unselecting: null
- 	},
- 	_create: function() {
- 		var that = this;
-
- 		this._addClass( "az-rangeSelectable" );
-
- 		this.dragged = false;
-
- 		// Cache selectee children based on filter
- 		this.refresh = function() {
- 			that.elementPos = $( that.element[ 0 ] ).offset();
- 			that.selectees = $( that.options.filter, that.element[ 0 ] );
- 			that._addClass( that.selectees, "ui-selectee" );
- 			that.selectees.each( function() {
- 				var $this = $( this ),
- 					selecteeOffset = $this.offset(),
- 					pos = {
- 						left: selecteeOffset.left - that.elementPos.left,
- 						top: selecteeOffset.top - that.elementPos.top
- 					};
- 				$.data( this, "selectable-item", {
- 					element: this,
- 					$element: $this,
- 					left: pos.left,
- 					top: pos.top,
- 					right: pos.left + $this.outerWidth(),
- 					bottom: pos.top + $this.outerHeight(),
- 					startselected: false,
- 					selected: $this.hasClass( "ui-selected" ),
- 					selecting: $this.hasClass( "ui-selecting" ),
- 					unselecting: $this.hasClass( "ui-unselecting" )
- 				} );
- 			} );
- 		};
- 		this.refresh();
-
- 		this._mouseInit();
-
- 		this.helper = $( "<div>" );
- 		this._addClass( this.helper, "ui-selectable-helper" );
- 	},
-
- 	_destroy: function() {
- 		this.selectees.removeData( "selectable-item" );
- 		this._mouseDestroy();
- 	},
-
- 	_mouseStart: function( event ) {
- 		var that = this,
- 			options = this.options;
-
- 		this.opos = [ event.pageX, event.pageY ];
- 		this.elementPos = $( this.element[ 0 ] ).offset();
-
- 		// Parent element dimensions
- 		this.elementHeigth = $( this.element[ 0 ] ).height();
- 		this.elementWidth = $( this.element[ 0 ] ).width();
-
-
- 		if ( this.options.disabled ) {
- 			return;
- 		}
-
- 		this.selectees = $( options.filter, this.element[ 0 ] );
-
- 		this._trigger( "start", event );
-
- 		$( options.appendTo ).append( this.helper );
-
- 		// position helper (lasso)
- 		this.helper.css( {
- 			"left": event.pageX,
- 			"top": event.pageY,
- 			"width": 0,
- 			"height": 0
- 		} );
-
- 		if ( options.autoRefresh ) {
- 			this.refresh();
- 		}
-
- 		this.selectees.filter( ".ui-selected" ).each( function() {
- 			var selectee = $.data( this, "selectable-item" );
- 			this.firstSelectee = selectee;
- 			selectee.startselected = true;
- 			if ( !event.metaKey && !event.ctrlKey ) {
- 				that._removeClass( selectee.$element, "ui-selected" );
- 				selectee.selected = false;
- 				that._addClass( selectee.$element, "ui-unselecting" );
- 				selectee.unselecting = true;
-
- 				// selectable UNSELECTING callback
- 				that._trigger( "unselecting", event, {
- 					unselecting: selectee.element
- 				} );
- 			}
- 		} );
-
- 		$( event.target ).parents().addBack().each( function() {
- 			var doSelect,
- 				selectee = $.data( this, "selectable-item" );
- 			if ( selectee ) {
- 				doSelect = ( !event.metaKey && !event.ctrlKey ) ||
- 					!selectee.$element.hasClass( "ui-selected" );
- 				that._removeClass( selectee.$element, doSelect ? "ui-unselecting" : "ui-selected" )
- 					._addClass( selectee.$element, doSelect ? "ui-selecting" : "ui-unselecting" );
- 				selectee.unselecting = !doSelect;
- 				selectee.selecting = doSelect;
- 				selectee.selected = doSelect;
-
- 				// selectable (UN)SELECTING callback
- 				if ( doSelect ) {
- 					that._trigger( "selecting", event, {
- 						selecting: selectee.element
- 					} );
- 				} else {
- 					that._trigger( "unselecting", event, {
- 						unselecting: selectee.element
- 					} );
- 				}
- 				return false;
- 			}
- 		} );
-
  	},
 
  	_mouseDrag: function( event ) {
@@ -337,38 +213,5 @@
  		} );
 
  		return false;
- 	},
-
- 	_mouseStop: function( event ) {
- 		var that = this;
-
- 		this.dragged = false;
-
- 		$( ".ui-unselecting", this.element[ 0 ] ).each( function() {
- 			var selectee = $.data( this, "selectable-item" );
- 			that._removeClass( selectee.$element, "ui-unselecting" );
- 			selectee.unselecting = false;
- 			selectee.startselected = false;
- 			that._trigger( "unselected", event, {
- 				unselected: selectee.element
- 			} );
- 		} );
- 		$( ".ui-selecting", this.element[ 0 ] ).each( function() {
- 			var selectee = $.data( this, "selectable-item" );
- 			that._removeClass( selectee.$element, "ui-selecting" )
- 				._addClass( selectee.$element, "ui-selected" );
- 			selectee.selecting = false;
- 			selectee.selected = true;
- 			selectee.startselected = true;
- 			that._trigger( "selected", event, {
- 				selected: selectee.element
- 			} );
- 		} );
- 		this._trigger( "stop", event );
-
- 		this.helper.remove();
-
- 		return false;
  	}
-
 } );
