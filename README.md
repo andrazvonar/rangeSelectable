@@ -8,17 +8,19 @@
 
 ``` html
 <ol id="selectable">
-  <li class="ui-state-default">1</li>
-  <li class="ui-state-default">2</li>
-  <li class="ui-state-default">3</li>
-  <li class="ui-state-default">4</li>
+  <li>1</li>
+  <li>2</li>
+  <li>3</li>
+  <li>4</li>
 </ol>
 ```
 
 ``` javascript
 $( document ).ready( function() {
 
-  $('#selectable').rangeSelectable();
+  $( '#selectable' ).rangeSelectable({
+    filter: 'li'
+  });
 
 });
 ```
